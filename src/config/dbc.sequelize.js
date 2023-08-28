@@ -5,6 +5,6 @@ export const dbc_sequelize = async () =>{
         await sequelize.sync({force: false})
         console.log('Conexion exitosa con la base de datos')
     }catch(err){
-        console.error('Error de conexion: ' + err)
+        console.error('Error de conexion: ' + err.message)
     }
 }
