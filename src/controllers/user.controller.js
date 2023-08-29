@@ -1,4 +1,5 @@
 import { User } from '../models/user.model.js'
+import { encrypt } from '../helpers/bcrypt.js'
 
 export const getUsers = async (req, res) => {
     try{
@@ -12,6 +13,12 @@ export const getUsers = async (req, res) => {
 export const addUser = async (req, res) => {
     try{
         const { ...data } = req.body
+        const existe = await User.findOne({where: { fullname: data.fullname }})
+        if(existe)
+            return res.status(400).json({msg: `The user ${existe.fullname} already exists`})
+
+        data.password = await encrypt(data.password)
+
         const user = await User.create(data)
         return res.status(201).json({msg: `User added successfully`, user})
     }catch(err){
