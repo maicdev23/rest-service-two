@@ -1,4 +1,9 @@
 import { Movie } from '../models/movie.model.js'
+import { initializeApp } from "firebase/app";
+import { firebaseConfig } from "../config/firebase.js";
+import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
+
+initializeApp(firebaseConfig); const storage = getStorage()
 
 export const getMovies = async (req, res) => {
     try{
@@ -12,7 +17,12 @@ export const getMovies = async (req, res) => {
 export const addMovie = async (req, res) => {
     try{
         const { ...data } = req.body
-        const movie = await Movie.create(data)
+        const storageRef = ref(storage, `archivos/${Date.now()}`)
+        const metadata = { contentType: req.file.mimetype };
+        const snapshot = await uploadBytes(storageRef, req.file.buffer, metadata)
+        const urlx = await getDownloadURL(snapshot.ref);
+
+        data.image = urlx; const movie = await Movie.create(data)
         return res.status(201).json({msg: `Movie added successfully`, movie})
     }catch(err){
         return res.status(500).json({err: err.message})
