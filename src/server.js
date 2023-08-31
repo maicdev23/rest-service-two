@@ -21,11 +21,11 @@ export default class Servidor{
     
     routes(){
         this.app.use('/api/v1', rutas, users)
-        this.app.use((req, res) => {
-            return res.status(404).json({ message: 'Resource not found' });
-        })
         this.app.get('*', (req, res) => {
             res.sendFile(path.resolve('src/public/index.html'))
+        })
+        this.app.use((req, res) => {
+            return res.status(404).json({ message: 'Resource not found' });
         })
     }
     

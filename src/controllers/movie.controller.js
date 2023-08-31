@@ -1,7 +1,7 @@
 import { Movie } from '../models/movie.model.js'
 import { initializeApp } from "firebase/app";
 import { firebaseConfig } from "../config/firebase.js";
-import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
+import { deleteObject, getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 
 initializeApp(firebaseConfig); const storage = getStorage()
 
@@ -22,7 +22,8 @@ export const addMovie = async (req, res) => {
         const snapshot = await uploadBytes(storageRef, req.file.buffer, metadata)
         const urlx = await getDownloadURL(snapshot.ref);
 
-        data.image = urlx; const movie = await Movie.create(data)
+        data.image = urlx; data.mimetype = req.file.mimetype;
+        const movie = await Movie.create(data)
         return res.status(201).json({msg: `Movie added successfully`, movie})
     }catch(err){
         return res.status(500).json({err: err.message})
@@ -41,26 +42,37 @@ export const getMovie = async (req, res) => {
     }
 }
 
-export const deleteMovie = async (req, res) => {
+export const updateMovie = async (req, res) => {
     try{
         const { id } = req.params
-        const movie = await Movie.destroy({where: {id} })
+
+        const movie = await Movie.findOne({where: {id}})
         if(!movie) return res.status(404).json({msg: 'Movie not found'})
 
-        return res.status(200).json({msg: `Movie deleted successfully`})
+        const storageRef = ref(storage, movie.image)
+        const metadata = { contentType: req.file.mimetype }
+        await uploadBytes(storageRef, req.file.buffer, metadata);
+        const newFileUrl = await getDownloadURL(storageRef);
+
+        //movie.set(req.body); const data = await movie.save()
+        const data = await movie.update({...req.body, image: newFileUrl});
+        return res.status(201).json({msg: `Movie updated successfully`, data})
     }catch(err){
         return res.status(500).json({err: err.message})
     }
 }
 
-export const updateMovie = async (req, res) => {
+export const deleteMovie = async (req, res) => {
     try{
         const { id } = req.params
-        const movie = await Movie.findOne({where: {id} })
+        const movie = await Movie.findOne({ where: { id } })
         if(!movie) return res.status(404).json({msg: 'Movie not found'})
-        
-        movie.set(req.body); const data = await movie.save()
-        return res.status(201).json({msg: `Movie updated successfully`, data})
+
+        await Movie.destroy({where: {id}})
+        const desertRef = ref(storage, movie.image)
+        await deleteObject(desertRef);
+
+        return res.status(200).json({msg: `Movie deleted successfully`})
     }catch(err){
         return res.status(500).json({err: err.message})
     }

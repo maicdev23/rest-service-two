@@ -8,7 +8,9 @@ export const Movie = sequelize.define(
 
         name: { type: DataTypes.STRING },
 
-        image: { type: DataTypes.STRING }
+        image: { type: DataTypes.STRING },
+
+        mimetype: { type: DataTypes.STRING }
 
     },
     {
