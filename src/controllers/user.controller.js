@@ -13,9 +13,9 @@ export const getUsers = async (req, res) => {
 export const addUser = async (req, res) => {
     try{
         const { ...data } = req.body
-        const existe = await User.findOne({where: { fullname: data.fullname }})
+        const existe = await User.findOne({where: { username: data.username }})
         if(existe)
-            return res.status(400).json({msg: `The user ${existe.fullname} already exists`})
+            return res.status(400).json({msg: `The user ${existe.username} already exists`})
 
         data.password = await encrypt(data.password)
 

@@ -1,10 +1,12 @@
 import { DataTypes } from 'sequelize'
 import { sequelize } from '../config/conn.js'
 
+import { User } from "./user.model.js";
+
 export const Movie = sequelize.define(
     "movie",
     {
-        id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+        id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, primaryKey: true },
 
         name: { type: DataTypes.STRING },
 
@@ -17,3 +19,6 @@ export const Movie = sequelize.define(
         timestamps: false,
     }
 )
+
+User.hasMany(Movie, { foreignKey: 'userId' })
+Movie.belongsTo(User, { foreignKey: 'userId' })

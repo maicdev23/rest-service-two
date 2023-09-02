@@ -1,4 +1,4 @@
-import express, { urlencoded } from 'express';
+import express from 'express';
 import cors from "cors";
 import path from "path";
 
@@ -16,14 +16,14 @@ export default class Servidor{
 
     middlewares(){
         this.app.use(cors()); this.app.use(express.json())
-        this.app.use(express.static(path.resolve('src/public')))
+        //this.app.use(express.static(path.resolve('src/public')))
     }
     
     routes(){
         this.app.use('/api/v1', rutas, users)
-        this.app.get('*', (req, res) => {
-            res.sendFile(path.resolve('src/public/index.html'))
-        })
+        //this.app.get('*', (req, res) => {
+        //  res.sendFile(path.resolve('src/public/index.html'))
+        //})
         this.app.use((req, res) => {
             return res.status(404).json({ message: 'Resource not found' });
         })

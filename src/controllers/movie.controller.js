@@ -23,7 +23,7 @@ export const addMovie = async (req, res) => {
         const urlx = await getDownloadURL(snapshot.ref);
 
         data.image = urlx; data.mimetype = req.file.mimetype;
-        const movie = await Movie.create(data)
+        const movie = await Movie.create({...data, userId: req.userId})
         return res.status(201).json({msg: `Movie added successfully`, movie})
     }catch(err){
         return res.status(500).json({err: err.message})
@@ -48,6 +48,11 @@ export const updateMovie = async (req, res) => {
 
         const movie = await Movie.findOne({where: {id}})
         if(!movie) return res.status(404).json({msg: 'Movie not found'})
+
+        if(!req.file){
+            movie.set(req.body); const data = await movie.save()
+            return res.status(201).json({msg: `Movie updated successfully`, data})
+        }
 
         const storageRef = ref(storage, movie.image)
         const metadata = { contentType: req.file.mimetype }
