@@ -2,8 +2,8 @@ import express from 'express';
 import cors from "cors";
 import path from "path";
 
-import rutas from './routes/movie.routes.js';
-import users from './routes/user.routes.js';
+import router from "./routes/index.js";
+
 
 export default class Servidor{
     constructor(){
@@ -20,13 +20,8 @@ export default class Servidor{
     }
     
     routes(){
-        this.app.use('/api/v1', rutas, users)
-        //this.app.get('*', (req, res) => {
-        //  res.sendFile(path.resolve('src/public/index.html'))
-        //})
-        this.app.use((req, res) => {
-            return res.status(404).json({ message: 'Resource not found' });
-        })
+        this.app.use('/', router)
+        //this.app.get('*', (req, res) => res.sendFile(path.resolve('src/public/index.html')) )
     }
     
     listen(){

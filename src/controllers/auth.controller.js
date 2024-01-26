@@ -14,7 +14,7 @@ export const authUser = async (req, res) => {
         if(!match) return res.status(404).json({ msg: 'Contraseña incorrecta' })
 
         const token = jwt.sign({id: existe.id}, process.env.JWT, { expiresIn: '1h' })
-        return res.status(200).json({ msg: 'Welcome', auth: true, accessToken: token})
+        return res.status(200).json({ msg: 'Welcome', auth: true, accessToken: token, usuario: existe })
     } catch (err) {
         return res.status(500).json({ msg: err.message })
     }

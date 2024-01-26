@@ -7,7 +7,9 @@ initializeApp(firebaseConfig); const storage = getStorage()
 
 export const getMovies = async (req, res) => {
     try{
-        const movies = await Movie.findAll()
+        const movies = await Movie.findAll({
+            where: { userId: req.userId }
+        })
         return res.status(200).json(movies)
     }catch(err){
         return res.status(500).json({err: err.message})
@@ -17,6 +19,10 @@ export const getMovies = async (req, res) => {
 export const addMovie = async (req, res) => {
     try{
         const { ...data } = req.body
+
+        if (!req.file || !req.file.mimetype.startsWith('image/'))
+            return res.status(400).json({ msg: 'POR FAVOR SELECCIONE UNA IMAGEN VALIDA.' });
+        
         const storageRef = ref(storage, `archivos/${Date.now()}`)
         const metadata = { contentType: req.file.mimetype };
         const snapshot = await uploadBytes(storageRef, req.file.buffer, metadata)
@@ -78,6 +84,15 @@ export const deleteMovie = async (req, res) => {
         await deleteObject(desertRef);
 
         return res.status(200).json({msg: `Movie deleted successfully`})
+    }catch(err){
+        return res.status(500).json({err: err.message})
+    }
+}
+
+export const freeMovie = async (req, res) => {
+    try{
+        const movies = await Movie.findAll()
+        return res.status(200).json(movies)
     }catch(err){
         return res.status(500).json({err: err.message})
     }

@@ -1,6 +1,8 @@
 import { DataTypes } from 'sequelize'
 import { sequelize } from '../config/conn.js'
 
+import { UserRol } from "./user-rol.model.js";
+
 export const User = sequelize.define(
     "user",
     {
@@ -17,3 +19,6 @@ export const User = sequelize.define(
         timestamps: false,
     }
 )
+
+UserRol.hasMany(User, { foreignKey: 'userRolId' })
+User.belongsTo(UserRol, { foreignKey: 'userRolId' })
