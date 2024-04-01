@@ -1,12 +1,11 @@
 import { Router } from "express";
 
-import rutas from './movie.routes.js';
-import users from './user.routes.js';
-import rols from './user-rol.routes.js';
+import post from './post.routes.js';
+import user from './user.routes.js';
 
 const router = Router()
 
-router.use('/api/v1', rutas, users, rols);
+router.use('/api', post, user);
 router.use('*', (req, res) => {
     return res.status(404).json({ message: 'Resource not found' });
 })

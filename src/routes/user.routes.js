@@ -1,20 +1,25 @@
 import { Router } from 'express'
 import { authUser, mainUser } from '../controllers/auth.controller.js'
 import { addUser, deleteUser, getUser, getUsers, updateUser } from '../controllers/user.controller.js'
-import { isAdmin, isUser, verifyToken } from '../middlewares/verifyAuth.js'
+import { isAdmin, verifyToken } from '../middlewares/verifyAuth.js'
+import { addUserRol, getUsersRol } from '../controllers/user-rol.controller.js'
 
-const rutas = Router()
+const user = Router()
 
-rutas.post('/auth', authUser)
-rutas.get('/main', [ verifyToken ], [ isAdmin ], mainUser)
+user.post('/auth', authUser)
+user.get('/main', [ verifyToken ], [ isAdmin ], mainUser)
 
-rutas.route('/user')
+user.route('/user')
     .get(getUsers)
     .post(addUser)
 
-rutas.route('/user/:id')
+user.route('/user/:id')
     .get(getUser)
     .delete(deleteUser)
     .put(updateUser)
 
-export default rutas
+user.route('/rol')
+    .get(getUsersRol)
+    .post(addUserRol)
+
+export default user

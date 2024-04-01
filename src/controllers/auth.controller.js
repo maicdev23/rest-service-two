@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 
 import { User } from "../models/user.model.js";
-import { Movie } from "../models/movie.model.js";
+import { Post } from "../models/post.model.js";
 import { decrypt } from "../helpers/bcrypt.js";
 
 export const authUser = async (req, res) => {
@@ -23,8 +23,8 @@ export const authUser = async (req, res) => {
 export const mainUser = async (req, res) => {
     try {
         const user = await User.findByPk(req.userId, { attributes: { exclude: ['password'] } })
-        const movie = await Movie.findAll({where: { userId: req.userId}})
-        return res.status(200).json({user, movie})
+        const post = await Post.findAll({where: { userId: req.userId}})
+        return res.status(200).json({user, post})
     } catch (err) {
         return res.status(500).json({ msg: err.message })
     }

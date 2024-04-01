@@ -3,14 +3,16 @@ import { sequelize } from '../config/conn.js'
 
 import { User } from "./user.model.js";
 
-export const Movie = sequelize.define(
-    "movie",
+export const Post = sequelize.define(
+    "post",
     {
         id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, primaryKey: true },
 
         name: { type: DataTypes.STRING },
 
-        image: { type: DataTypes.STRING },
+        cdn_file: { type: DataTypes.STRING },
+
+        filename: { type: DataTypes.STRING },
 
         mimetype: { type: DataTypes.STRING }
 
@@ -20,5 +22,5 @@ export const Movie = sequelize.define(
     }
 )
 
-User.hasMany(Movie, { foreignKey: 'userId' })
-Movie.belongsTo(User, { foreignKey: 'userId' })
+User.hasMany(Post, { foreignKey: 'userId' })
+Post.belongsTo(User, { foreignKey: 'userId' })
