@@ -6,11 +6,11 @@ import { addPost, deletePost, fullPosts, getPost, getPosts, updatePost } from '.
 const post = Router()
 
 post.route('/post')
-    .get([ verifyToken ], getPosts)
-    .post([ verifyToken ], [ multer ], addPost)
+    .get([verifyToken], getPosts)
+    .post([verifyToken], [multer], addPost)
 
 post.route('/post/:id')
-    .put([ verifyToken ], [ multer ], updatePost)
+    .put([verifyToken], [multer], updatePost)
     .get(getPost)
     .delete(deletePost)
 

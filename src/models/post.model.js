@@ -8,7 +8,7 @@ export const Post = sequelize.define(
     {
         id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, primaryKey: true },
 
-        name: { type: DataTypes.STRING },
+        name: { type: DataTypes.STRING, defaultValue: 'Post of user' },
 
         cdn_file: { type: DataTypes.STRING },
 

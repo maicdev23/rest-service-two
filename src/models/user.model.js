@@ -20,5 +20,5 @@ export const User = sequelize.define(
     }
 )
 
-UserRol.hasMany(User, { foreignKey: 'userRolId' })
-User.belongsTo(UserRol, { foreignKey: 'userRolId' })
+UserRol.hasMany(User, { foreignKey: 'rol_id' })
+User.belongsTo(UserRol, { foreignKey: 'rol_id' })

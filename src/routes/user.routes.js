@@ -1,13 +1,13 @@
 import { Router } from 'express'
 import { authUser, mainUser } from '../controllers/auth.controller.js'
 import { addUser, deleteUser, getUser, getUsers, updateUser } from '../controllers/user.controller.js'
-import { isAdmin, verifyToken } from '../middlewares/verifyAuth.js'
+import { verifyToken } from '../middlewares/verifyAuth.js'
 import { addUserRol, getUsersRol } from '../controllers/user-rol.controller.js'
 
 const user = Router()
 
 user.post('/auth', authUser)
-user.get('/main', [ verifyToken ], [ isAdmin ], mainUser)
+user.get('/main', [verifyToken], mainUser)
 
 user.route('/user')
     .get(getUsers)
