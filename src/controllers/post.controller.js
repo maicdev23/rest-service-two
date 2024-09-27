@@ -16,7 +16,7 @@ export const addPost = async (req, res) => {
     try {
         const { ...data } = req.body
 
-        const upload = await supabaseClient.storage.from('rest-storage').upload('file' + Date.now(), req.file.buffer)
+        const upload = await supabaseClient.storage.from('rest-storage/express').upload('file' + Date.now(), req.file.buffer)
         const urlimg = `${process.env.SUPABASE_URL}/storage/v1/object/public/${upload.data.fullPath}`
 
         data.cdn_file = urlimg;
@@ -55,7 +55,7 @@ export const updatePost = async (req, res) => {
             return res.status(201).json({ msg: `Post updated successfully` })
         }
 
-        await supabaseClient.storage.from('rest-storage').update(post.filename, req.file.buffer)
+        await supabaseClient.storage.from('rest-storage/express').update(post.filename, req.file.buffer)
 
         data.mimetype = req.file.mimetype;
 
@@ -73,7 +73,8 @@ export const deletePost = async (req, res) => {
         if (!post) return res.status(404).json({ msg: 'Post not found' })
 
         await Post.destroy({ where: { id } })
-        await supabaseClient.storage.from('rest-storage').remove([post.filename])
+        
+        await supabaseClient.storage.from('rest-storage').remove(`express/${[post.filename]}`)
 
         return res.status(200).json({ msg: `Post deleted successfully` })
     } catch (err) {

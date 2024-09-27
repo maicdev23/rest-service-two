@@ -23,8 +23,7 @@ export const authUser = async (req, res) => {
 export const mainUser = async (req, res) => {
     try {
         const user = await User.findByPk(req.userId, { attributes: { exclude: ['password'] } })
-        const post = await Post.findAll({ where: { userId: req.userId } })
-        return res.status(200).json({ user, post })
+        return res.status(200).json(user)
     } catch (err) {
         return res.status(500).json({ msg: err.message })
     }

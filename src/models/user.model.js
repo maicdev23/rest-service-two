@@ -1,24 +1,33 @@
 import { DataTypes } from 'sequelize'
 import { sequelize } from '../config/conn.js'
 
-import { UserRol } from "./user-rol.model.js";
-
 export const User = sequelize.define(
     "user",
     {
-        id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+        id: {
+            primaryKey: true,
+            type: DataTypes.UUID,
+            defaultValue: DataTypes.UUIDV4
+        },
 
-        fullname: { type: DataTypes.STRING },
+        fullname: {
+            type: DataTypes.STRING
+        },
 
-        username: { type: DataTypes.STRING },
+        username: {
+            type: DataTypes.STRING
+        },
 
-        password: { type: DataTypes.STRING }
+        password: {
+            type: DataTypes.STRING
+        },
 
+        role: {
+            type: DataTypes.ENUM('ADMIN', 'USER'),
+            defaultValue: 'USER'
+        }
     },
     {
         timestamps: false,
     }
 )
-
-UserRol.hasMany(User, { foreignKey: 'rol_id' })
-User.belongsTo(UserRol, { foreignKey: 'rol_id' })
