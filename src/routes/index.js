@@ -6,7 +6,7 @@ import user from './user.routes.js';
 const router = Router()
 
 router.use('/api', post, user);
-router.use('*', (req, res) => {
+router.use('/*not_found', (req, res) => {
     return res.status(404).json({ message: 'Resource not found' });
 })
 

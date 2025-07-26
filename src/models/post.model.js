@@ -16,11 +16,11 @@ export const Post = sequelize.define(
             type: DataTypes.STRING, defaultValue: 'Post of user'
         },
 
-        cdn_file: {
+        url: {
             type: DataTypes.STRING
         },
 
-        filename: {
+        fileId: {
             type: DataTypes.STRING
         },
 

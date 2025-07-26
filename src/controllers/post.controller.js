@@ -1,92 +1,108 @@
+import { imagekit } from '../config/imagekit.js'
 import { Post } from '../models/post.model.js'
-import { supabaseClient } from '../config/supabase.js';
+
+// Función auxiliar para manejar errores
+const handleError = (res, err) => res.status(500).json({ err: err.message });
+
+// Función auxiliar para obtener un post por id
+const findPostById = async (id) => await Post.findOne({ where: { id } });
 
 export const getPosts = async (req, res) => {
     try {
-        const post = await Post.findAll({
-            where: { userId: req.userId }
-        })
-        return res.status(200).json(post)
+        const posts = await Post.findAll({ where: { userId: req.userId } });
+        return res.status(200).json(posts);
     } catch (err) {
-        return res.status(500).json({ err: err.message })
+        return handleError(res, err);
     }
-}
+};
 
 export const addPost = async (req, res) => {
     try {
-        const { ...data } = req.body
+        const data = req.body;
 
-        const upload = await supabaseClient.storage.from('rest-storage/express').upload('file' + Date.now(), req.file.buffer)
-        const urlimg = `${process.env.SUPABASE_URL}/storage/v1/object/public/${upload.data.fullPath}`
+        if (!req.file)
+            return res.status(400).json({ msg: 'POR FAVOR SELECCIONE UN FILE VALIDO.' });
 
-        data.cdn_file = urlimg;
-        data.filename = upload.data.path;
-        data.mimetype = req.file.mimetype;
+        const result = await imagekit.upload({
+            file: req.file.buffer,
+            fileName: Date.now().toString(),
+            folder: 'express',
+        });
 
-        const post = await Post.create({ ...data, userId: req.userId })
-        return res.status(201).json({ msg: `Post added successfully`, post })
+        Object.assign(data, {
+            url: result.url,
+            fileId: result.fileId,
+            mimetype: req.file.mimetype,
+            userId: req.userId,
+        });
+
+        const post = await Post.create(data);
+        return res.status(201).json({ msg: 'Post added successfully', post });
     } catch (err) {
-        return res.status(500).json({ err: err.message })
+        return handleError(res, err);
     }
-}
+};
 
 export const getPost = async (req, res) => {
     try {
-        const { id } = req.params
-        const post = await Post.findByPk(id)
-
-        if (!post) return res.status(404).json({ msg: 'Post not found' })
-
-        return res.status(200).json(post)
+        const post = await findPostById(req.params.id);
+        if (!post) return res.status(404).json({ msg: 'Post not found' });
+        return res.status(200).json(post);
     } catch (err) {
-        return res.status(500).json({ err: err.message })
+        return handleError(res, err);
     }
-}
+};
 
 export const updatePost = async (req, res) => {
     try {
-        const { id } = req.params; const data = req.body;
+        const { id } = req.params;
+        const data = req.body;
+        const post = await findPostById(id);
 
-        const post = await Post.findOne({ where: { id } })
-        if (!post) return res.status(404).json({ msg: 'Post not found' })
+        if (!post) return res.status(404).json({ msg: 'Post not found' });
 
-        if (!req.file) {
-            post.set(data); await post.save()
-            return res.status(201).json({ msg: `Post updated successfully` })
+        if (req.file) {
+            if (post.fileId) await imagekit.deleteFile(post.fileId);
+
+            const result = await imagekit.upload({
+                file: req.file.buffer,
+                fileName: Date.now().toString(),
+                folder: 'express',
+            });
+
+            Object.assign(data, {
+                url: result.url,
+                fileId: result.fileId,
+                mimetype: req.file.mimetype,
+            });
         }
 
-        await supabaseClient.storage.from('rest-storage/express').update(post.filename, req.file.buffer)
-
-        data.mimetype = req.file.mimetype;
-
         await post.update(data);
-        return res.status(201).json({ msg: `Post updated successfully` })
+        return res.status(200).json({ msg: 'Post updated successfully' });
     } catch (err) {
-        return res.status(500).json({ err: err.message })
+        return handleError(res, err);
     }
-}
+};
 
 export const deletePost = async (req, res) => {
     try {
-        const { id } = req.params
-        const post = await Post.findOne({ where: { id } })
-        if (!post) return res.status(404).json({ msg: 'Post not found' })
+        const post = await findPostById(req.params.id);
+        if (!post) return res.status(404).json({ msg: 'Post not found' });
 
-        await Post.destroy({ where: { id } })
-        
-        await supabaseClient.storage.from('rest-storage').remove(`express/${[post.filename]}`)
+        if (post.fileId) await imagekit.deleteFile(post.fileId);
+        await Post.destroy({ where: { id: req.params.id } });
 
-        return res.status(200).json({ msg: `Post deleted successfully` })
+        return res.status(200).json({ msg: 'Post deleted successfully' });
     } catch (err) {
-        return res.status(500).json({ err: err.message })
+        return handleError(res, err);
     }
-}
+};
 
 export const fullPosts = async (req, res) => {
     try {
-        const posts = await Post.findAll()
-        return res.status(200).json(posts)
+        const posts = await Post.findAll();
+        return res.status(200).json(posts);
     } catch (err) {
-        return res.status(500).json({ err: err.message })
+        return handleError(res, err);
     }
-}
+};
